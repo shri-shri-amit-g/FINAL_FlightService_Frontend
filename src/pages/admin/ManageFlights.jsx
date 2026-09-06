@@ -86,6 +86,37 @@ function ManageFlights() {
   }
 };
 
+
+  const validateFlight = () => {
+
+  if (!flightNumber.trim()) {
+    toast.error("Flight Number is required");
+    return false;
+  }
+
+  if (flightNumber.trim().length < 3) {
+    toast.error("Flight Number must contain at least 3 characters");
+    return false;
+  }
+
+  if (!totalSeats) {
+    toast.error("Total Seats is required");
+    return false;
+  }
+
+  if (totalSeats <= 0) {
+    toast.error("Total Seats must be greater than 0");
+    return false;
+  }
+
+  if (source === destination) {
+    toast.error("Source and Destination cannot be same");
+    return false;
+  }
+
+  return true;
+};
+
   const clearForm = () => {
 
     setIsEdit(false);
@@ -102,65 +133,29 @@ function ManageFlights() {
 
     setTotalSeats("");
   };
-
-
+  
 const saveFlight = async () => {
 
-  if (!flightNumber.trim()) {
-
-    toast.error(
-      "Flight Number is required"
-    );
-
-    return;
-  }
-
-  if (totalSeats <= 0) {
-
-    toast.error(
-      "Total Seats must be greater than 0"
-    );
-
-    return;
-  }
-
-  if (source === destination) {
-
-    toast.warning(
-      "Source and Destination cannot be same"
-    );
-
+  if (!validateFlight()) {
     return;
   }
 
   try {
 
     const flight = {
-
       flightId: 0,
-
       flightNumber,
-
       airline,
-
       source,
-
       destination,
-
       totalSeats: Number(totalSeats)
-
     };
 
-    await FlightService.addFlight(
-      flight
-    );
+    await FlightService.addFlight(flight);
 
-    toast.success(
-      "Flight Added Successfully"
-    );
+    toast.success("Flight Added Successfully");
 
     loadFlights();
-
     clearForm();
 
   } catch (error) {
@@ -169,79 +164,44 @@ const saveFlight = async () => {
       error.response?.data?.message ||
       "Something went wrong"
     );
+  }
+};
+ const updateFlight = async () => {
 
+  if (!validateFlight()) {
+    return;
   }
 
-};
-  const updateFlight = async () => {
+  try {
 
-    
-    if (!flightNumber.trim()) {
+    const updatedFlight = {
+      flightId,
+      flightNumber,
+      airline,
+      source,
+      destination,
+      totalSeats: Number(totalSeats)
+    };
 
-  toast.error(
-    "Flight Number is required"
-  );
+    await FlightService.updateFlight(
+      flightId,
+      updatedFlight
+    );
 
-  return;
-}
+    toast.success("Flight Updated Successfully");
 
-if (totalSeats <= 0) {
+    loadFlights();
+    clearForm();
 
-  toast.error(
-    "Total Seats must be greater than 0"
-  );
-
-  return;
-}
-
-if (source === destination) {
-
-  toast.warning(
-    "Source and Destination cannot be same"
-  );
-
-  return;
-}
-    try {
-
-      const updatedFlight = {
-
-        flightId,
-
-        flightNumber,
-
-        airline,
-
-        source,
-
-        destination,
-
-        totalSeats: Number(totalSeats)
-
-      };
-
-      await FlightService.updateFlight(
-        flightId,
-        updatedFlight
-      );
-
-      toast.success(
-        "Flight Updated Successfully"
-      );
-
-      loadFlights();
-
-      clearForm();
-
-    } catch (error) {
+  } catch (error) {
 
     toast.error(
-    error.response?.data?.message
-    || "Something went wrong"
-  );
+      error.response?.data?.message ||
+      "Something went wrong"
+    );
+  }
+};
 
-    }
-  };
 
   const deleteFlight = async (id) => {
 
@@ -353,15 +313,13 @@ const filteredFlights =
                 : "Add Flight"}
 
             </h4>
-
             <input
               className="form-control mb-3"
               placeholder="Flight Number"
+              maxLength="20"
               value={flightNumber}
               onChange={(e) =>
-                setFlightNumber(
-                  e.target.value
-                )
+                setFlightNumber(e.target.value)
               }
             />
 
@@ -430,13 +388,12 @@ const filteredFlights =
 
             <input
               type="number"
+              min="1"
               className="form-control mb-3"
               placeholder="Total Seats"
               value={totalSeats}
               onChange={(e) =>
-                setTotalSeats(
-                  e.target.value
-                )
+                setTotalSeats(e.target.value)
               }
             />
 

@@ -15,131 +15,135 @@ function ManageSeats() {
     setAvailableSeats] =
     useState(null);
 
-  const checkSeats = async () => {
+    const validateSeatRequest = () => {
 
-    if (!scheduleId) {
+  if (!scheduleId) {
+    toast.error("Schedule ID is required");
+    return false;
+  }
 
-      toast.error(
-        "Schedule ID is required"
+  if (!count) {
+    toast.error("Seat Count is required");
+    return false;
+  }
+
+  if (Number(count) <= 0) {
+    toast.error(
+      "Seat Count must be greater than 0"
+    );
+    return false;
+  }
+
+  return true;
+};
+ const checkSeats = async () => {
+
+  if (!scheduleId) {
+
+    toast.error(
+      "Schedule ID is required"
+    );
+
+    return;
+  }
+
+  try {
+
+    const response =
+      await SeatService.checkSeats(
+        Number(scheduleId)
       );
 
-      return;
+    setAvailableSeats(
+      response.data
+    );
 
-    }
+  } catch (error) {
 
-    try {
+    toast.error(
+      error.response?.data?.message ||
+      "Something went wrong"
+    );
 
-      const response =
-        await SeatService.checkSeats(
-          scheduleId
-        );
+  }
 
-      setAvailableSeats(
-        response.data
-      );
+};
+ const addSeats = async () => {
 
-    } catch (error) {
+  if (!validateSeatRequest()) {
+    return;
+  }
 
-      toast.error(
-        error.response?.data?.message ||
-        "Something went wrong"
-      );
+  try {
 
-    }
+    await SeatService.addSeats(
+      Number(scheduleId),
+      Number(count)
+    );
 
-  };
+    toast.success(
+      "Seats Added Successfully"
+    );
 
-  const addSeats = async () => {
+    checkSeats();
 
-    if (!scheduleId) {
+    setCount("");
 
-      toast.error(
-        "Schedule ID is required"
-      );
+  } catch (error) {
 
-      return;
+    toast.error(
+      error.response?.data?.message ||
+      "Something went wrong"
+    );
 
-    }
+  }
 
-    if (count <= 0) {
+};
 
-      toast.error(
-        "Seat count must be greater than 0"
-      );
 
-      return;
+ const reduceSeats = async () => {
 
-    }
+  if (!validateSeatRequest()) {
+    return;
+  }
 
-    try {
+  if (
+    availableSeats !== null &&
+    Number(count) > Number(availableSeats)
+  ) {
 
-      await SeatService.addSeats(
-        scheduleId,
-        count
-      );
+    toast.error(
+      "Cannot reduce more seats than available"
+    );
 
-      toast.success(
-        "Seats Added Successfully"
-      );
+    return;
+  }
 
-      checkSeats();
+  try {
 
-    } catch (error) {
+    await SeatService.reduceSeats(
+      Number(scheduleId),
+      Number(count)
+    );
 
-      toast.error(
-        error.response?.data?.message ||
-        "Something went wrong"
-      );
+    toast.success(
+      "Seats Reduced Successfully"
+    );
 
-    }
+    checkSeats();
 
-  };
+    setCount("");
 
-  const reduceSeats = async () => {
+  } catch (error) {
 
-    if (!scheduleId) {
+    toast.error(
+      error.response?.data?.message ||
+      "Something went wrong"
+    );
 
-      toast.error(
-        "Schedule ID is required"
-      );
+  }
 
-      return;
-
-    }
-
-    if (count <= 0) {
-
-      toast.error(
-        "Seat count must be greater than 0"
-      );
-
-      return;
-
-    }
-
-    try {
-
-      await SeatService.reduceSeats(
-        scheduleId,
-        count
-      );
-
-      toast.success(
-        "Seats Reduced Successfully"
-      );
-
-      checkSeats();
-
-    } catch (error) {
-
-      toast.error(
-        error.response?.data?.message ||
-        "Something went wrong"
-      );
-
-    }
-
-  };
+};
 
   return (
     <>
@@ -159,12 +163,16 @@ function ManageSeats() {
               type="number"
               className="form-control mb-3"
               placeholder="Schedule ID"
+              min="1"
               value={scheduleId}
-              onChange={(e) =>
+              onChange={(e) =>{
                 setScheduleId(
                   e.target.value
                 )
+                setAvailableSeats(null);
               }
+              }
+              
             />
 
             <button
@@ -188,15 +196,14 @@ function ManageSeats() {
 
             )}
 
-            <input
+           <input
               type="number"
+              min="1"
               className="form-control mb-3"
               placeholder="Seat Count"
               value={count}
               onChange={(e) =>
-                setCount(
-                  e.target.value
-                )
+                setCount(e.target.value)
               }
             />
 

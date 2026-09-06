@@ -19,7 +19,7 @@ function ManageSchedules() {
   const [source, setSource] = useState("DELHI");
   const [destination, setDestination] = useState("USA");
   const [price, setPrice] = useState("");
-  const [searchTerm, setSearchTerm] =useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [isEdit, setIsEdit] = useState(false);
 
@@ -51,15 +51,78 @@ function ManageSchedules() {
 
       setSchedules(response.data);
 
-    } catch(error){
+    } catch (error) {
 
-  toast.error(
-    error.response?.data?.message
-    || "Something went wrong"
-  );
+      toast.error(
+        error.response?.data?.message
+        || "Something went wrong"
+      );
 
-}
+    }
 
+  };
+
+  const validateSchedule = () => {
+
+    if (!flightId) {
+      toast.error("Flight ID is required");
+      return false;
+    }
+
+    if (!departureDate) {
+      toast.error("Departure Date is required");
+      return false;
+    }
+
+    if (!departureTime) {
+      toast.error("Departure Time is required");
+      return false;
+    }
+
+    if (!arrivalTime) {
+      toast.error("Arrival Time is required");
+      return false;
+    }
+
+    if (!availableSeats) {
+      toast.error("Available Seats is required");
+      return false;
+    }
+
+    if (!price) {
+      toast.error("Price is required");
+      return false;
+    }
+
+    if (arrivalTime <= departureTime) {
+      toast.error(
+        "Arrival Time must be after Departure Time"
+      );
+      return false;
+    }
+
+    if (Number(availableSeats) <= 0) {
+      toast.error(
+        "Available Seats must be greater than 0"
+      );
+      return false;
+    }
+
+    if (price <= 0) {
+      toast.error(
+        "Price must be greater than 0"
+      );
+      return false;
+    }
+
+    if (source === destination) {
+      toast.error(
+        "Source and Destination cannot be same"
+      );
+      return false;
+    }
+
+    return true;
   };
 
   const clearForm = () => {
@@ -82,50 +145,9 @@ function ManageSchedules() {
 
   const saveSchedule = async () => {
 
-    if (!flightId) {
-
-  toast.error(
-    "Flight ID is required"
-  );
-
-  return;
-}
-
-if (!departureDate) {
-
-  toast.error(
-    "Departure Date is required"
-  );
-
-  return;
-}
-
-if (!departureTime) {
-
-  toast.error(
-    "Departure Time is required"
-  );
-
-  return;
-}
-
-if (!arrivalTime) {
-
-  toast.error(
-    "Arrival Time is required"
-  );
-
-  return;
-}
-
-if (price <= 0) {
-
-  toast.error(
-    "Price must be greater than 0"
-  );
-
-  return;
-}
+    if (!validateSchedule()) {
+      return;
+    }
 
     try {
 
@@ -164,21 +186,23 @@ if (price <= 0) {
       );
 
       loadSchedules();
-
       clearForm();
 
-    } catch(error){
+    } catch (error) {
 
-  toast.error(
-    error.response?.data?.message
-    || "Something went wrong"
-  );
+      toast.error(
+        error.response?.data?.message
+        || "Something went wrong"
+      );
 
-}
+    }
 
   };
-
   const updateSchedule = async () => {
+
+    if (!validateSchedule()) {
+      return;
+    }
 
     try {
 
@@ -220,17 +244,16 @@ if (price <= 0) {
       );
 
       loadSchedules();
-
       clearForm();
 
-    } catch(error){
+    } catch (error) {
 
-  toast.error(
-    error.response?.data?.message
-    || "Something went wrong"
-  );
+      toast.error(
+        error.response?.data?.message
+        || "Something went wrong"
+      );
 
-}
+    }
 
   };
 
@@ -257,24 +280,24 @@ if (price <= 0) {
 
       loadSchedules();
 
-    } catch(error){
+    } catch (error) {
 
-  toast.error(
-    error.response?.data?.message
-    || "Something went wrong"
-  );
+      toast.error(
+        error.response?.data?.message
+        || "Something went wrong"
+      );
 
-}
+    }
 
   };
 
-  
+
   const filteredSchedules =
-  schedules.filter((schedule) =>
-    schedule.flightId
-      .toString()
-      .includes(searchTerm)
-  );
+    schedules.filter((schedule) =>
+      schedule.flightId
+        .toString()
+        .includes(searchTerm)
+    );
 
   return (
     <>
@@ -299,15 +322,23 @@ if (price <= 0) {
             </h4>
 
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
               className="form-control mb-3"
               placeholder="Flight ID"
               value={flightId}
-              onChange={(e) =>
-                setFlightId(
-                  e.target.value
-                )
-              }
+              onChange={(e) => {
+
+                const value = e.target.value;
+
+                if (
+                  value === "" ||
+                  !Number.isNaN(Number(value))
+                ) {
+                  setFlightId(value);
+                }
+
+              }}
             />
 
             <input
@@ -344,33 +375,48 @@ if (price <= 0) {
             />
 
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
               className="form-control mb-3"
-              placeholder="Total Seats"
+              placeholder="Available Seats"
               value={availableSeats}
-              onChange={(e) =>
-                setAvailableSeats(
-                  e.target.value
-                )
-              }
+              onChange={(e) => {
+
+                const value = e.target.value;
+
+                if (
+                  value === "" ||
+                  !Number.isNaN(Number(value))
+                ) {
+                  setAvailableSeats(value);
+                }
+
+              }}
             />
 
-           
 
 
-            
+
+
 
             <input
-              type="number"
-              step="0.01"
+              type="text"
+              inputMode="decimal"
               className="form-control mb-3"
               placeholder="Price"
               value={price}
-              onChange={(e) =>
-                setPrice(
-                  e.target.value
-                )
-              }
+              onChange={(e) => {
+
+                const value = e.target.value;
+
+                if (
+                  value === "" ||
+                  !Number.isNaN(Number(value))
+                ) {
+                  setPrice(value);
+                }
+
+              }}
             />
 
             {isEdit ? (
@@ -387,7 +433,7 @@ if (price <= 0) {
                   onClick={clearForm}
                 >
                   Cancel
-       
+
                 </button>
               </>
             ) : (
@@ -403,15 +449,25 @@ if (price <= 0) {
 
         </div>
 
-<input
-  type="text"
-  className="form-control mb-3"
-  placeholder="Search by Flight ID"
-  value={searchTerm}
-  onChange={(e) =>
-    setSearchTerm(e.target.value)
-  }
-/>
+        <input
+          type="text"
+          inputMode="numeric"
+          className="form-control mb-3"
+          placeholder="Search by Flight ID"
+          value={searchTerm}
+          onChange={(e) => {
+
+            const value = e.target.value;
+
+            if (
+              value === "" ||
+              !Number.isNaN(Number(value))
+            ) {
+              setSearchTerm(value);
+            }
+
+          }}
+        />
         <h4 className="mb-3">
           All Schedules
         </h4>

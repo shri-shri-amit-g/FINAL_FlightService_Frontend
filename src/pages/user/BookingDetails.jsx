@@ -9,27 +9,33 @@ function BookingDetails() {
   const [bookingId, setBookingId] = useState("");
   const [booking, setBooking] = useState(null);
 
-  const findBooking = async () => {
+const findBooking = async () => {
 
-    try {
+  if (!bookingId) {
+    toast.error("Please enter Booking ID");
+    return;
+  }
 
-      const response =
-        await BookingService.getBookingById(
-          bookingId
-        );
+  try {
 
-      setBooking(response.data);
+    const response =
+      await BookingService.getBookingById(
+        bookingId
+      );
 
-    } catch(error){
+    setBooking(response.data);
 
-  toast.error(
-    error.response?.data?.message
-    || "Something went wrong"
-  );
+  } catch (error) {
 
-}
+    setBooking(null);
 
-  };
+    toast.error(
+      error.response?.data?.message ||
+      "Something went wrong"
+    );
+
+  }
+};
 
   const cancelBooking = async () => {
 
@@ -54,14 +60,14 @@ function BookingDetails() {
       setBooking(null);
       setBookingId("");
 
-    } catch(error){
+    } catch (error) {
 
-  toast.error(
-    error.response?.data?.message
-    || "Something went wrong"
-  );
+      toast.error(
+        error.response?.data?.message
+        || "Something went wrong"
+      );
 
-}
+    }
 
   };
 
@@ -87,13 +93,13 @@ function BookingDetails() {
                   id="bookingId"
                   name="bookingId"
                   type="number"
+                  min="1"
+                  step="1"
                   className="form-control"
                   placeholder="Enter Booking ID"
                   value={bookingId}
                   onChange={(e) =>
-                    setBookingId(
-                      e.target.value
-                    )
+                    setBookingId(e.target.value)
                   }
                 />
 
@@ -104,6 +110,7 @@ function BookingDetails() {
                 <button
                   className="btn btn-success w-100"
                   onClick={findBooking}
+                  disabled={!bookingId}
                 >
                   Search
                 </button>

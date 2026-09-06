@@ -12,11 +12,16 @@ function AdminLogin() {
 
   const login = () => {
 
-    const token = btoa(
-      username + ":" + password
-    );
+   const token = btoa(
+  username + ":" + password
+);
 
-    localStorage.setItem(
+localStorage.setItem(
+  "auth",
+  token
+);
+
+localStorage.setItem(
   "adminLoggedIn",
   "true"
 );

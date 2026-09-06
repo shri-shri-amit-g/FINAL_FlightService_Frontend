@@ -12,26 +12,37 @@ function MyBookings() {
 
   const searchBookings = async () => {
 
-    try {
+  if (!userId) {
+    toast.error("Please enter User ID");
+    return;
+  }
 
-      const response =
-        await BookingService.getBookingsByUser(
-          userId
-        );
+  if (userId <= 0) {
+    toast.error("User ID must be greater than 0");
+    return;
+  }
 
-      setBookings(response.data);
+  try {
 
-    } catch(error){
+    const response =
+      await BookingService.getBookingsByUser(userId);
 
-  toast.error(
-    error.response?.data?.message
-    || "Something went wrong"
-  );
+    setBookings(response.data);
 
-}
+    if (response.data.length === 0) {
+      toast.info("No bookings found");
+    }
 
-  };
+  } catch (error) {
 
+    setBookings([]);
+
+    toast.error(
+      error.response?.data?.message ||
+      "Something went wrong"
+    );
+  }
+};
   return (
     <>
       <Navbar />
@@ -54,12 +65,11 @@ function MyBookings() {
                   id="userId"
                   name="userId"
                   type="number"
+                  min="1"
                   className="form-control"
                   placeholder="Enter User ID"
                   value={userId}
-                  onChange={(e) =>
-                    setUserId(e.target.value)
-                  }
+                  onChange={(e) => setUserId(e.target.value)}
                 />
 
               </div>

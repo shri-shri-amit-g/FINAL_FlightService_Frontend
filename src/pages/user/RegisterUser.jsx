@@ -7,6 +7,7 @@ function RegisterUser() {
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
 
   const [houseNo, setHouseNo] = useState("");
   const [state, setState] = useState("");
@@ -33,6 +34,16 @@ function RegisterUser() {
 
     if (!emailRegex.test(email)) {
       toast.error("Please enter a valid email");
+      return false;
+    }
+
+    if (!password.trim()) {
+      toast.error("Password is required");
+      return false;
+    }
+
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
       return false;
     }
 
@@ -102,12 +113,13 @@ function RegisterUser() {
       const user = {
         userName,
         email,
-        phoneNumber,
+        phoneNumber: Number(phoneNumber),
+        password,
         permanentAddress: {
           houseNo: Number(houseNo),
           state,
           country,
-          pinCode,
+          pinCode: Number(pinCode),
         },
       };
 
@@ -118,6 +130,7 @@ function RegisterUser() {
       setUserName("");
       setEmail("");
       setPhoneNumber("");
+      setPassword("");
       setHouseNo("");
       setState("");
       setCountry("");
@@ -139,7 +152,6 @@ function RegisterUser() {
           <div className="col-md-8">
             <div className="card shadow">
               <div className="card-body">
-
                 <h2 className="text-center mb-4">
                   Register User
                 </h2>
@@ -170,6 +182,21 @@ function RegisterUser() {
                     value={email}
                     onChange={(e) =>
                       setEmail(e.target.value)
+                    }
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    placeholder="Set Password"
+                    value={password}
+                    onChange={(e) =>
+                      setPassword(e.target.value)
                     }
                   />
                 </div>
@@ -267,7 +294,6 @@ function RegisterUser() {
                 >
                   Register User
                 </button>
-
               </div>
             </div>
           </div>
