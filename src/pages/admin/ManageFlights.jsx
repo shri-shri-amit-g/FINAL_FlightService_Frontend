@@ -151,11 +151,15 @@ const saveFlight = async () => {
       totalSeats: Number(totalSeats)
     };
 
-    await FlightService.addFlight(flight);
+    const response= await FlightService.addFlight(flight);
+
+    setFlights((prev)=>[
+      ...prev,response.data
+    ])
 
     toast.success("Flight Added Successfully");
 
-    loadFlights();
+    // loadFlights();
     clearForm();
 
   } catch (error) {
@@ -183,14 +187,21 @@ const saveFlight = async () => {
       totalSeats: Number(totalSeats)
     };
 
-    await FlightService.updateFlight(
+    const response= await FlightService.updateFlight(
       flightId,
       updatedFlight
     );
 
+    setFlights((prev) =>
+  prev.map((item) =>
+    item.flightId === flightId
+      ? response.data
+      : item
+  )
+);
     toast.success("Flight Updated Successfully");
 
-    loadFlights();
+    // loadFlights();
     clearForm();
 
   } catch (error) {
@@ -223,7 +234,11 @@ const saveFlight = async () => {
         "Flight Deleted Successfully"
       );
 
-      loadFlights();
+      setFlights((prev)=>
+      prev.filter((flight)=> flight.flightId!==id)
+    );
+
+      // loadFlights();
 
     } catch(error){
 

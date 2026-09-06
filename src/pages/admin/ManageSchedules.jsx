@@ -1,42 +1,39 @@
 import { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar";
 import ScheduleService from "../../services/ScheduleService";
-import { handleError } from "../../utils/HandleError";
 import { toast } from "react-toastify";
 
 function ManageSchedules() {
 
   const [schedules, setSchedules] = useState([]);
 
-  const [scheduleId, setScheduleId] = useState(null);
+  const [scheduleId, setScheduleId] =
+    useState(null);
 
-  const [flightId, setFlightId] = useState("");
-  const [departureDate, setDepartureDate] = useState("");
-  const [departureTime, setDepartureTime] = useState("");
-  const [arrivalTime, setArrivalTime] = useState("");
-  const [availableSeats, setAvailableSeats] = useState("");
-  const [totalCapacity, setTotalCapacity] = useState("");
-  const [source, setSource] = useState("DELHI");
-  const [destination, setDestination] = useState("USA");
-  const [price, setPrice] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [flightId, setFlightId] =
+    useState("");
 
-  const [isEdit, setIsEdit] = useState(false);
+  const [departureDate,
+    setDepartureDate] =
+    useState("");
 
-  const locations = [
-    "DELHI",
-    "MUMBAI",
-    "BANGALORE",
-    "CHENNAI",
-    "DUBAI",
-    "QATAR",
-    "USA",
-    "RUSSIA",
-    "CHINA",
-    "SINGAPORE",
-    "MALDIVES",
-    "ANDAMAN_AND_NICOBAR_ISLAND"
-  ];
+  const [departureTime,
+    setDepartureTime] =
+    useState("");
+
+  const [arrivalTime,
+    setArrivalTime] =
+    useState("");
+
+  const [price, setPrice] =
+    useState("");
+
+  const [searchTerm,
+    setSearchTerm] =
+    useState("");
+
+  const [isEdit, setIsEdit] =
+    useState(false);
 
   useEffect(() => {
     loadSchedules();
@@ -54,8 +51,8 @@ function ManageSchedules() {
     } catch (error) {
 
       toast.error(
-        error.response?.data?.message
-        || "Something went wrong"
+        error.response?.data?.message ||
+        "Something went wrong"
       );
 
     }
@@ -65,60 +62,74 @@ function ManageSchedules() {
   const validateSchedule = () => {
 
     if (!flightId) {
-      toast.error("Flight ID is required");
+
+      toast.error(
+        "Flight ID is required"
+      );
+
+      return false;
+    }
+
+    if (Number(flightId) <= 0) {
+
+      toast.error(
+        "Flight ID must be greater than 0"
+      );
+
       return false;
     }
 
     if (!departureDate) {
-      toast.error("Departure Date is required");
+
+      toast.error(
+        "Departure Date is required"
+      );
+
       return false;
     }
 
     if (!departureTime) {
-      toast.error("Departure Time is required");
+
+      toast.error(
+        "Departure Time is required"
+      );
+
       return false;
     }
 
     if (!arrivalTime) {
-      toast.error("Arrival Time is required");
-      return false;
-    }
 
-    if (!availableSeats) {
-      toast.error("Available Seats is required");
+      toast.error(
+        "Arrival Time is required"
+      );
+
       return false;
     }
 
     if (!price) {
-      toast.error("Price is required");
-      return false;
-    }
 
-    if (arrivalTime <= departureTime) {
       toast.error(
-        "Arrival Time must be after Departure Time"
+        "Price is required"
       );
+
       return false;
     }
 
-    if (Number(availableSeats) <= 0) {
-      toast.error(
-        "Available Seats must be greater than 0"
-      );
-      return false;
-    }
+    if (Number(price) <= 0) {
 
-    if (price <= 0) {
       toast.error(
         "Price must be greater than 0"
       );
+
       return false;
     }
 
-    if (source === destination) {
+    if (arrivalTime >= departureTime) {
+
       toast.error(
-        "Source and Destination cannot be same"
+        "Departure Time must be after Arrival Time"
       );
+
       return false;
     }
 
@@ -132,15 +143,14 @@ function ManageSchedules() {
     setScheduleId(null);
 
     setFlightId("");
-    setDepartureDate("");
-    setDepartureTime("");
-    setArrivalTime("");
-    setAvailableSeats("");
-    setTotalCapacity("");
-    setSource("DELHI");
-    setDestination("USA");
-    setPrice("");
 
+    setDepartureDate("");
+
+    setDepartureTime("");
+
+    setArrivalTime("");
+
+    setPrice("");
   };
 
   const saveSchedule = async () => {
@@ -153,7 +163,8 @@ function ManageSchedules() {
 
       const schedule = {
 
-        flightId: Number(flightId),
+        flightId:
+          Number(flightId),
 
         departureDate,
 
@@ -161,43 +172,40 @@ function ManageSchedules() {
 
         arrivalTime,
 
-        availableSeats: Number(
-          availableSeats
-        ),
-
-        totalCapacity: Number(
-          totalCapacity
-        ),
-
-        source,
-
-        destination,
-
-        price: Number(price)
+        price:
+          Number(price)
 
       };
 
-      await ScheduleService.addSchedule(
-        schedule
-      );
+      const response =
+        await ScheduleService.addSchedule(
+          schedule
+        );
+
+      setSchedules((prev) => [
+        ...prev,
+        response.data
+      ]);
 
       toast.success(
         "Schedule Added Successfully"
       );
 
-      loadSchedules();
+      // loadSchedules();
+
       clearForm();
 
     } catch (error) {
 
       toast.error(
-        error.response?.data?.message
-        || "Something went wrong"
+        error.response?.data?.message ||
+        "Something went wrong"
       );
 
     }
 
   };
+
   const updateSchedule = async () => {
 
     if (!validateSchedule()) {
@@ -208,9 +216,8 @@ function ManageSchedules() {
 
       const schedule = {
 
-        scheduleId,
-
-        flightId: Number(flightId),
+        flightId:
+          Number(flightId),
 
         departureDate,
 
@@ -218,39 +225,32 @@ function ManageSchedules() {
 
         arrivalTime,
 
-        availableSeats: Number(
-          availableSeats
-        ),
-
-        totalCapacity: Number(
-          totalCapacity
-        ),
-
-        source,
-
-        destination,
-
-        price: Number(price)
+        price:
+          Number(price)
 
       };
 
-      await ScheduleService.updateSchedule(
-        scheduleId,
-        schedule
+     const response = await ScheduleService.updateSchedule(scheduleId,schedule);
+
+      setSchedules((prev) =>
+        prev.map((item) =>
+          item.scheduleId === scheduleId? response.data : item
+        )
       );
 
       toast.success(
         "Schedule Updated Successfully"
       );
 
-      loadSchedules();
+      // loadSchedules();
+
       clearForm();
 
     } catch (error) {
 
       toast.error(
-        error.response?.data?.message
-        || "Something went wrong"
+        error.response?.data?.message ||
+        "Something went wrong"
       );
 
     }
@@ -259,10 +259,7 @@ function ManageSchedules() {
 
   const deleteSchedule = async (id) => {
 
-    const confirmDelete =
-      window.confirm(
-        "Delete Schedule?"
-      );
+    const confirmDelete = window.confirm( "Delete Schedule ?");
 
     if (!confirmDelete) {
       return;
@@ -270,33 +267,35 @@ function ManageSchedules() {
 
     try {
 
-      await ScheduleService.deleteSchedule(
-        id
+      await ScheduleService.deleteSchedule(id);
+
+      setSchedules((prev) =>
+        prev.filter((schedule) => schedule.scheduleId!==id)
       );
 
       toast.success(
         "Schedule Deleted Successfully"
       );
 
-      loadSchedules();
+      // loadSchedules();
 
     } catch (error) {
 
       toast.error(
-        error.response?.data?.message
-        || "Something went wrong"
+        error.response?.data?.message ||
+        "Something went wrong"
       );
 
     }
 
   };
 
-
   const filteredSchedules =
-    schedules.filter((schedule) =>
-      schedule.flightId
-        .toString()
-        .includes(searchTerm)
+    schedules.filter(
+      (schedule) =>
+        schedule.flightId
+          .toString()
+          .includes(searchTerm)
     );
 
   return (
@@ -314,32 +313,31 @@ function ManageSchedules() {
           <div className="card-body">
 
             <h4 className="mb-3">
-
               {isEdit
                 ? "Update Schedule"
                 : "Add Schedule"}
-
             </h4>
+
+            <label className="form-label">
+              Flight ID
+            </label>
 
             <input
               type="text"
               inputMode="numeric"
               className="form-control mb-3"
-              placeholder="Flight ID"
+              placeholder="Enter Flight ID"
               value={flightId}
-              onChange={(e) => {
-
-                const value = e.target.value;
-
-                if (
-                  value === "" ||
-                  !Number.isNaN(Number(value))
-                ) {
-                  setFlightId(value);
-                }
-
-              }}
+              onChange={(e) =>
+                setFlightId(
+                  e.target.value
+                )
+              }
             />
+
+            <label className="form-label">
+              Departure Date
+            </label>
 
             <input
               type="date"
@@ -352,16 +350,10 @@ function ManageSchedules() {
               }
             />
 
-            <input
-              type="time"
-              className="form-control mb-3"
-              value={departureTime}
-              onChange={(e) =>
-                setDepartureTime(
-                  e.target.value
-                )
-              }
-            />
+
+            <label className="form-label">
+              Arrival Time
+            </label>
 
             <input
               type="time"
@@ -374,56 +366,45 @@ function ManageSchedules() {
               }
             />
 
+            <label className="form-label">
+              Departure Time
+            </label>
+
+            <input
+              type="time"
+              className="form-control mb-3"
+              value={departureTime}
+              onChange={(e) =>
+                setDepartureTime(
+                  e.target.value
+                )
+              }
+            />
+
+            <label className="form-label">
+              Ticket Price
+            </label>
+
             <input
               type="text"
               inputMode="numeric"
               className="form-control mb-3"
-              placeholder="Available Seats"
-              value={availableSeats}
-              onChange={(e) => {
-
-                const value = e.target.value;
-
-                if (
-                  value === "" ||
-                  !Number.isNaN(Number(value))
-                ) {
-                  setAvailableSeats(value);
-                }
-
-              }}
-            />
-
-
-
-
-
-
-            <input
-              type="text"
-              inputMode="decimal"
-              className="form-control mb-3"
-              placeholder="Price"
+              placeholder="Enter Ticket Price"
               value={price}
-              onChange={(e) => {
-
-                const value = e.target.value;
-
-                if (
-                  value === "" ||
-                  !Number.isNaN(Number(value))
-                ) {
-                  setPrice(value);
-                }
-
-              }}
+              onChange={(e) =>
+                setPrice(
+                  e.target.value
+                )
+              }
             />
 
             {isEdit ? (
               <>
                 <button
                   className="btn btn-warning"
-                  onClick={updateSchedule}
+                  onClick={
+                    updateSchedule
+                  }
                 >
                   Update Schedule
                 </button>
@@ -433,13 +414,14 @@ function ManageSchedules() {
                   onClick={clearForm}
                 >
                   Cancel
-
                 </button>
               </>
             ) : (
               <button
                 className="btn btn-primary"
-                onClick={saveSchedule}
+                onClick={
+                  saveSchedule
+                }
               >
                 Add Schedule
               </button>
@@ -451,151 +433,142 @@ function ManageSchedules() {
 
         <input
           type="text"
-          inputMode="numeric"
           className="form-control mb-3"
-          placeholder="Search by Flight ID"
+          placeholder="Search Flight ID"
           value={searchTerm}
-          onChange={(e) => {
-
-            const value = e.target.value;
-
-            if (
-              value === "" ||
-              !Number.isNaN(Number(value))
-            ) {
-              setSearchTerm(value);
-            }
-
-          }}
+          onChange={(e) =>
+            setSearchTerm(
+              e.target.value
+            )
+          }
         />
+
         <h4 className="mb-3">
           All Schedules
         </h4>
 
-        {filteredSchedules.map((schedule) => (
-          <div
-            key={schedule.scheduleId}
-            className="card shadow-sm mb-3"
-          >
+        {filteredSchedules.map(
+          (schedule) => (
+            <div
+              key={
+                schedule.scheduleId
+              }
+              className="
+                card shadow-sm mb-3
+              "
+            >
 
-            <div className="card-body">
+              <div className="card-body">
 
-              <h5 className="card-title">
-                Schedule #{schedule.scheduleId}
-              </h5>
+                <h5>
+                  Schedule #
+                  {schedule.scheduleId}
+                </h5>
 
-              <p>
-                <strong>Flight ID:</strong>{" "}
-                {schedule.flightId}
-              </p>
+                <p>
+                  <strong>
+                    Flight ID:
+                  </strong>{" "}
+                  {schedule.flightId}
+                </p>
 
-              <p>
-                <strong>Source:</strong>{" "}
-                {schedule.source}
-              </p>
+                <p>
+                  <strong>
+                    Source:
+                  </strong>{" "}
+                  {schedule.source}
+                </p>
 
-              <p>
-                <strong>Destination:</strong>{" "}
-                {schedule.destination}
-              </p>
+                <p>
+                  <strong>
+                    Destination:
+                  </strong>{" "}
+                  {schedule.destination}
+                </p>
 
-              <p>
-                <strong>Departure Date:</strong>{" "}
-                {schedule.departureDate}
-              </p>
+                <p>
+                  <strong>
+                    Departure Date:
+                  </strong>{" "}
+                  {schedule.departureDate}
+                </p>
 
-              <p>
-                <strong>Departure Time:</strong>{" "}
-                {schedule.departureTime}
-              </p>
+                <p>
+                  <strong>
+                    Arrival Time:
+                  </strong>{" "}
+                  {schedule.arrivalTime}
+                </p>
 
-              <p>
-                <strong>Arrival Time:</strong>{" "}
-                {schedule.arrivalTime}
-              </p>
+                <p>
+                  <strong>
+                    Departure Time:
+                  </strong>{" "}
+                  {schedule.departureTime}
+                </p>
 
-              <p>
-                <strong>Available Seats:</strong>{" "}
-                {schedule.availableSeats}
-              </p>
+                <p>
+                  <strong>
+                    Price:
+                  </strong>{" "}
+                  ₹{schedule.price}
+                </p>
 
-              <p>
-                <strong>Total Capacity:</strong>{" "}
-                {schedule.totalCapacity}
-              </p>
+                <button
+                  className="
+                    btn btn-warning me-2
+                  "
+                  onClick={() => {
 
-              <p>
-                <strong>Price:</strong>{" "}
-                ₹{schedule.price}
-              </p>
+                    setIsEdit(true);
 
-              <button
-                className="btn btn-warning me-2"
-                onClick={() => {
+                    setScheduleId(
+                      schedule.scheduleId
+                    );
 
-                  setIsEdit(true);
+                    setFlightId(
+                      schedule.flightId
+                    );
 
-                  setScheduleId(
-                    schedule.scheduleId
-                  );
+                    setDepartureDate(
+                      schedule.departureDate
+                    );
 
-                  setFlightId(
-                    schedule.flightId
-                  );
+                    setDepartureTime(
+                      schedule.departureTime
+                    );
 
-                  setDepartureDate(
-                    schedule.departureDate
-                  );
+                    setArrivalTime(
+                      schedule.arrivalTime
+                    );
 
-                  setDepartureTime(
-                    schedule.departureTime
-                  );
+                    setPrice(
+                      schedule.price
+                    );
 
-                  setArrivalTime(
-                    schedule.arrivalTime
-                  );
+                  }}
+                >
+                  Update
+                </button>
 
-                  setAvailableSeats(
-                    schedule.availableSeats
-                  );
+                <button
+                  className="
+                    btn btn-danger
+                  "
+                  onClick={() =>
+                    deleteSchedule(
+                      schedule.scheduleId
+                    )
+                  }
+                >
+                  Delete
+                </button>
 
-                  setTotalCapacity(
-                    schedule.totalCapacity
-                  );
-
-                  setSource(
-                    schedule.source
-                  );
-
-                  setDestination(
-                    schedule.destination
-                  );
-
-                  setPrice(
-                    schedule.price
-                  );
-
-                }}
-              >
-                Update
-              </button>
-
-              <button
-                className="btn btn-danger"
-                onClick={() =>
-                  deleteSchedule(
-                    schedule.scheduleId
-                  )
-                }
-              >
-                Delete
-              </button>
+              </div>
 
             </div>
-
-          </div>
-
-        ))}
+          )
+        )}
 
       </div>
     </>
